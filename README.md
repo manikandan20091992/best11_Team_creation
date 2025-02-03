@@ -11,8 +11,7 @@ to generate the optimal team with recommended captain and vice-captain choices.
 
 To install this project, follow these steps:
 
-```bash
-
+git clone https://github.com/manikandan20091992/best11_Team_creation.git
 cd MyProject
 pip install -r requirements.txt  # If using Python
 pip install scikit-learn
