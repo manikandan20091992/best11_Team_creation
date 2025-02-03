@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Match Detail - Dream 11 Style</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .player-card {
+            max-width: 150px;
+            margin: auto;
+            cursor: pointer;
+        }
+        .player-card img {
+            height: 100px;
+            object-fit: cover;
+        }
+        .player-card .card-body {
+            padding: 5px;
+        }
+        .card-title {
+            font-size: 1rem;
+        }
+        .card-text {
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="mt-4">Match Detail - Dream 11 Style</h2>
+
+        {% if teams %}
+            <!-- Form to Submit Selected Players -->
+            <form id="selectPlayersForm" action="{% url 'submit_selected_players' %}" method="POST">
+                {% csrf_token %}
+
+                <!-- Match Type Selection -->
+                <div class="form-group mt-3">
+                    <label for="matchType">Select Match Type:</label>
+                    <select id="matchType" name="match_type" class="form-control">
+                        <option value="">--Select Match Type--</option>
+                        <option value="t20">T20</option>
+                        <option value="odi">ODI</option>
+                        <option value="test">Test</option>
+                    </select>
+                </div>
+
+                <!-- Wicket Keepers Section -->
+                <h4 class="mt-4">Wicket Keepers (WK)</h4>
+                <div class="row">
+                    {% for team in teams %}
+                        {% for player in team.players %}
+                            {% if 'WK' in player.role %}
+                                <div class="col-md-2 mb-3">
+                                    <div class="card player-card" onclick="toggleCheckbox(event, '{{ player.id }}')">
+                                        <img src="{{ player.playerImg }}" class="card-img-top" alt="{{ player.name }}">
+                                        <div class="card-body">
+                                            <h5 class="card-title">{{ player.name }}</h5>
+                                            <input type="checkbox" name="player_ids" value="{{ player.id }}" class="player-checkbox" id="player-{{ player.id }}">
+                                            <label>Select</label>
+                                            <p class="card-text">
+                                                <strong>Role:</strong> 
+                                                <select name="player_roles_{{ player.id }}" class="form-control form-control-sm" style="display: inline-block; width: auto;">
+                                                    <option value="WK" {% if player.role == 'WK' %}selected{% endif %}>WK</option>
+                                                    <option value="Batsman" {% if player.role == 'Batsman' %}selected{% endif %}>Batsman</option>
+                                                    <option value="All-rounder" {% if 'Allrounder' in player.role %}selected{% endif %}>All-rounder</option>
+                                                    <option value="Bowler" {% if player.role == 'Bowler' %}selected{% endif %}>Bowler</option>
+                                                </select><br>
+                                                <strong>Batting Style:</strong> {{ player.battingStyle }}<br>
+                                                {% if player.bowlingStyle %}
+                                                    <strong>Bowling Style:</strong> {{ player.bowlingStyle }}<br>
+                                                {% endif %}
+                                                <strong>Country:</strong> {{ player.country }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+
+                <!-- Batsmen Section -->
+                <h4 class="mt-4">Batsmen</h4>
+                <div class="row">
+                    {% for team in teams %}
+                        {% for player in team.players %}
+                            {% if 'Batsman' in player.role and 'WK' not in player.role %}
+                                <div class="col-md-2 mb-3">
+                                    <div class="card player-card" onclick="toggleCheckbox(event, '{{ player.id }}')">
+                                        <img src="{{ player.playerImg }}" class="card-img-top" alt="{{ player.name }}">
+                                        <div class="card-body">
+                                            <h5 class="card-title">{{ player.name }}</h5>
+                                            <input type="checkbox" name="player_ids" value="{{ player.id }}" class="player-checkbox" id="player-{{ player.id }}">
+                                            <label>Select</label>
+                                            <p class="card-text">
+                                                <strong>Role:</strong> 
+                                                <select name="player_roles_{{ player.id }}" class="form-control form-control-sm" style="display: inline-block; width: auto;">
+                                                    <option value="WK" {% if player.role == 'WK' %}selected{% endif %}>WK</option>
+                                                    <option value="Batsman" {% if player.role == 'Batsman' %}selected{% endif %}>Batsman</option>
+                                                    <option value="All-rounder" {% if 'Allrounder' in player.role %}selected{% endif %}>All-rounder</option>
+                                                    <option value="Bowler" {% if player.role == 'Bowler' %}selected{% endif %}>Bowler</option>
+                                                </select><br>
+                                                <strong>Batting Style:</strong> {{ player.battingStyle }}<br>
+                                                {% if player.bowlingStyle %}
+                                                    <strong>Bowling Style:</strong> {{ player.bowlingStyle }}<br>
+                                                {% endif %}
+                                                <strong>Country:</strong> {{ player.country }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+
+                <!-- All-rounders Section -->
+                <h4 class="mt-4">All-rounders</h4>
+                <div class="row">
+                    {% for team in teams %}
+                        {% for player in team.players %}
+                            {% if 'Allrounder' in player.role or 'All-rounder' in player.role %}
+                                <div class="col-md-2 mb-3">
+                                    <div class="card player-card" onclick="toggleCheckbox(event, '{{ player.id }}')">
+                                        <img src="{{ player.playerImg }}" class="card-img-top" alt="{{ player.name }}">
+                                        <div class="card-body">
+                                            <h5 class="card-title">{{ player.name }}</h5>
+                                            <input type="checkbox" name="player_ids" value="{{ player.id }}" class="player-checkbox" id="player-{{ player.id }}">
+                                            <label>Select</label>
+                                            <p class="card-text">
+                                                <strong>Role:</strong> 
+                                                <select name="player_roles_{{ player.id }}" class="form-control form-control-sm" style="display: inline-block; width: auto;">
+                                                    <option value="WK" {% if player.role == 'WK' %}selected{% endif %}>WK</option>
+                                                    <option value="Batsman" {% if player.role == 'Batsman' %}selected{% endif %}>Batsman</option>
+                                                    <option value="All-rounder" {% if 'Allrounder' in player.role %}selected{% endif %}>All-rounder</option>
+                                                    <option value="Bowler" {% if player.role == 'Bowler' %}selected{% endif %}>Bowler</option>
+                                                </select><br>
+                                                <strong>Batting Style:</strong> {{ player.battingStyle }}<br>
+                                                {% if player.bowlingStyle %}
+                                                    <strong>Bowling Style:</strong> {{ player.bowlingStyle }}<br>
+                                                {% endif %}
+                                                <strong>Country:</strong> {{ player.country }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+
+                <!-- Bowlers Section -->
+                <h4 class="mt-4">Bowlers</h4>
+                <div class="row">
+                    {% for team in teams %}
+                        {% for player in team.players %}
+                            {% if 'Bowler' in player.role %}
+                                <div class="col-md-2 mb-3">
+                                    <div class="card player-card" onclick="toggleCheckbox(event, '{{ player.id }}')">
+                                        <img src="{{ player.playerImg }}" class="card-img-top" alt="{{ player.name }}">
+                                        <div class="card-body">
+                                            <h5 class="card-title">{{ player.name }}</h5>
+                                            <input type="checkbox" name="player_ids" value="{{ player.id }}" class="player-checkbox" id="player-{{ player.id }}">
+                                            <label>Select</label>
+                                            <p class="card-text">
+                                                <strong>Role:</strong> 
+                                                <select name="player_roles_{{ player.id }}" class="form-control form-control-sm" style="display: inline-block; width: auto;">
+                                                    <option value="WK" {% if player.role == 'WK' %}selected{% endif %}>WK</option>
+                                                    <option value="Batsman" {% if player.role == 'Batsman' %}selected{% endif %}>Batsman</option>
+                                                    <option value="All-rounder" {% if 'Allrounder' in player.role %}selected{% endif %}>All-rounder</option>
+                                                    <option value="Bowler" {% if player.role == 'Bowler' %}selected{% endif %}>Bowler</option>
+                                                </select><br>
+                                                <strong>Batting Style:</strong> {{ player.battingStyle }}<br>
+                                                {% if player.bowlingStyle %}
+                                                    <strong>Bowling Style:</strong> {{ player.bowlingStyle }}<br>
+                                                {% endif %}
+                                                <strong>Country:</strong> {{ player.country }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+
+                <!-- Submit Button -->
+                <center><button type="submit" class="btn btn-primary mt-4" onclick="return validateSelection();">Submit Selected Players</button></center>
+            </form>
+
+        {% else %}
+            <div class="alert alert-warning" role="alert">
+                No data available for this match.
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- JavaScript to Validate Selection and Toggle Checkbox -->
+    <script>
+        function validateSelection() {
+            const selectedPlayers = document.querySelectorAll('input[name="player_ids"]:checked');
+            const matchType = document.getElementById('matchType').value;
+
+            if (matchType === "") {
+                alert("Please select a match type.");
+                return false; // Prevent form submission if no match type is selected
+            }
+
+            return true; // Allow form submission
+        }
+
+        function toggleCheckbox(event, playerId) {
+            if (event.target.tagName !== 'INPUT' && event.target.tagName !== 'LABEL' && event.target.tagName !== 'SELECT') {
+                const checkbox = document.getElementById('player-' + playerId);
+                checkbox.checked = !checkbox.checked;
+            }
+        }
+    </script>
+</body>
+</html>

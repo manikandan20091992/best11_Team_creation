@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dream 11 Team View</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .team-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+        .role-section {
+            margin: 15px 0;
+            width: 80%;
+            border: 1px solid #000;
+            padding: 10px;
+            border-radius: 10px;
+        }
+        .role-header {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .player-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+        .player-card {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 5px;
+            margin: 5px;
+            width: 20%;
+            text-align: center;
+        }
+        .player-card.white-team {
+            background-color: #f1f1f1;
+        }
+        .player-card.black-team {
+            background-color: #333;
+            color: #fff;
+        }
+        .player-card span {
+            font-weight: bold;
+        }
+        .player-card img {
+            max-width: 70%;
+            height: auto;
+            border-radius: 5px;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="team-container">
+        <div class="role-section">
+            <div class="role-header">Wicket Keepers</div>
+            <div class="player-list" id="wk-section">
+                <!-- WK players will be added here -->
+            </div>
+        </div>
+        <div class="role-section">
+            <div class="role-header">Batsmen</div>
+            <div class="player-list" id="batsmen-section">
+                <!-- Batsman players will be added here -->
+            </div>
+        </div>
+        <div class="role-section">
+            <div class="role-header">All-rounders</div>
+            <div class="player-list" id="allrounders-section">
+                <!-- All-rounders will be added here -->
+            </div>
+        </div>
+        <div class="role-section">
+            <div class="role-header">Bowlers</div>
+            <div class="player-list" id="bowlers-section">
+                <!-- Bowlers will be added here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Render players using Django-provided data embedded into the HTML
+        const players = {{ data|safe }};
+
+        const roleMapping = {
+            'WK': 'wk-section',
+            'Batsman': 'batsmen-section',
+            'All-rounder': 'allrounders-section',
+            'Bowler': 'bowlers-section'
+        };
+
+        const renderPlayers = (players) => {
+            players.forEach(player => {
+                const playerCard = document.createElement('div');
+                playerCard.classList.add('player-card');
+
+                // Apply a class based on the team name to differentiate the teams
+                if (player.team === 'Team1') {
+                    playerCard.classList.add('white-team');
+                } else {
+                    playerCard.classList.add('black-team');
+                }
+
+                let playerName = player.player_name;
+                if (player.captain === 1) {
+                    playerName += ' (C)';
+                } else if (player.vice_captain === 1) {
+                    playerName += ' (VC)';
+                }
+
+                playerCard.innerHTML = `
+                    <img src="${player.playerImg}" alt="${player.player_name} image">
+                    <span>${playerName}</span><br>
+                    ${player.team}
+                `;
+
+                const roleSection = document.getElementById(roleMapping[player.role]);
+                if (roleSection) {
+                    roleSection.appendChild(playerCard);
+                }
+            });
+        };
+
+        // Render players on page load using data passed from Django
+        window.onload = () => renderPlayers(players);
+    </script>
+</body>
+</html>
